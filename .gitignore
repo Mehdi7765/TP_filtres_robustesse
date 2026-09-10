@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+# Environnements virtuels
+venv/
+.venv/
+env/
+# Éditeurs
+.vscode/
+.idea/
+*.swp
+# Système
+.DS_Store
+Thumbs.db
+# Captures d'écran et planches générées (touche « s », etalonnage.py --planche)
+captures/
