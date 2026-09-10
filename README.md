@@ -121,7 +121,7 @@ Les résultats et surtout **les explications demandées à l'oral** sont dans
 | `etalonnage.py` | balayage automatique des intensités |
 | `config.py` | caméra, modèle, taille d'entrée, cadence de détection |
 | `modeles/` | `yolov4-tiny.cfg`, `yolov4-tiny.weights`, `coco.names` |
-| `docs/observations.md` | mesures et explications pour l'oral |
+| `docs/observations.md` | mesures et explications pour l'oral (aussi en PDF : `docs/observations.pdf`) |
 | `docs/TP_filtres_robustesse.pdf` | le sujet |
 
 ## 5. Choix techniques
