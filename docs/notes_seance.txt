@@ -1,0 +1,59 @@
+NOTES DE SEANCE - TP filtres et robustesse (IA03)
+=================================================
+Date : 10/09/2026
+Machine : portable Linux, CPU seulement, webcam 640x480
+Modele : YOLOv4-tiny (OpenCV DNN), seuil de confiance 0.5
+Objet teste : une personne (nous, assis a ~1 m de la webcam, eclairage de la salle)
+
+Remarque de depart : en entree reseau 320 px la personne est detectee a 50-60 %,
+juste au niveau du seuil -> ca clignote. On est passe en 416 px (--taille-entree 416)
+pour les mesures : detection stable a 88-89 %. Cadence : ~12 img/s en 320, ~8 en 416.
+Deux essais complets en 416, memes resultats a +/- 1 pas.
+
+
+VALEURS OU LA DETECTION LACHE (personne, 416 px, seuil 0.5)
+------------------------------------------------------------
+filtre            plage         lache a        remarque
+-----------------------------------------------------------------------------------
+niveaux de gris   0 -> 100 %    jamais         100 % gris : toujours vu, confiance quasi identique
+flou              1 -> 61 px    33 px          vu sans probleme jusqu'a 31 px, chute nette a 33
+contours (Canny)  10 -> 400     des 10         aveugle quel que soit le seuil, l'image est pourtant lisible
+seuillage         0 -> 255      instable       vu par intermittence entre 40 et 135, plus rien au-dela de 140
+bruit             sigma 0->120  sigma 25       vu jusqu'a sigma 20, perdu a 25 ; bruit a peine visible a l'oeil
+pixellisation     1 -> 64 px    3-4 px         perdu des 3 ou 4 px selon l'essai (pixels encore petits !)
+posterisation     0 -> 7 bits   5 bits         tient jusqu'a 16 niveaux/canal, perdu a 8 niveaux
+assombrissement   0 -> 100 %    85 %           vu jusqu'a 80 % de lumiere retiree, image deja tres sombre
+inversion         0 -> 100 %    40 %           perdu a 40-50 % (image grisatre), pas revu a 100 % (negatif)
+
+Essai en 320 px (personne detectee a 50 %, donc en limite) :
+  flou 35 px / bruit sigma 35 / pixellisation 5 px / assombrissement 85 % / inversion 40 %
+  -> memes ordres de grandeur, mais valeurs moins fiables (on part deja a la limite du seuil).
+
+
+CE QU'ON A NOTE EN TESTANT
+--------------------------
+- Le flou et l'assombrissement sont tres tolerants : l'image est presque illisible
+  pour nous avant que le modele lache (flou 31 px, 80 % de lumiere en moins).
+- Le bruit est le plus surprenant : a sigma 20-25 on voit a peine le grain a l'ecran
+  et la detection tombe. Le compteur clignote autour du seuil (bruit retire a chaque image).
+- Contours : 0 objet a TOUTES les intensites, alors qu'on se reconnait parfaitement
+  sur le dessin au trait.
+- Seuillage : les detections entre 40 et 135 sont souvent de fausses "person"
+  sur des taches noires/blanches, a verifier a l'oeil (classe + position de la boite).
+- Pixellisation : chute des 3-4 px, bien plus tot que le flou. Un bloc de 4 px sur
+  640x480 c'est encore une image tres lisible.
+- Inversion : perdu a 40 % (image delavee, contraste nul vers 50 %), jamais revu
+  jusqu'a 100 % : le negatif est lisible pour nous, pas pour le modele.
+- Niveaux de gris et posterisation legere : quasiment aucun effet.
+
+En resume : le modele encaisse ce qui ressemble a ses donnees d'entrainement
+(gris, sombre, un peu flou) et lache sur ce qui n'est plus une "photo"
+(bruit haute frequence, image binaire, negatif). Pas lie a la lisibilite humaine.
+
+
+CADENCE (images/s, lissee sur 30 images)
+----------------------------------------
+sans detection                      : ~17 (limite de la webcam)
+detection 320 px, 1 image sur 2     : ~12
+detection 320 px, chaque image      : ~8
+detection 416 px, 1 image sur 2     : ~8

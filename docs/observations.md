@@ -112,8 +112,24 @@ Il est robuste aux transformations présentes dans ses données d'entraînement
 (couleur, luminosité, échelle) et fragile à tout ce qui déplace l'image hors de
 la distribution des photos naturelles (bruit, binarisation, négatif).
 
-## 3. Mesures devant la caméra (à compléter en séance)
+## 3. Mesures devant la caméra (séance du 10 septembre 2026)
+
+Objet : une personne à environ 1 m de la webcam (640×480), éclairage de la salle.
+En 320 px la personne est détectée à 50-60 %, à la limite du seuil : les mesures
+ont été faites en **416 px** (détection à 88-89 %), deux essais complets, mêmes
+résultats à un pas près. Le relevé brut est dans [`notes_seance.txt`](notes_seance.txt).
 
 | Objet | Filtre | Intensité où la détection lâche |
 |---|---|---|
-| | | |
+| personne | niveaux de gris | jamais (vu à 100 % gris) |
+| personne | flou | 33 px (vu sans problème jusqu'à 31 px) |
+| personne | contours | dès seuil 10 (aveugle partout) |
+| personne | seuillage | intermittent entre 40 et 135, plus rien au-delà de 140 |
+| personne | bruit | sigma 25 (vu jusqu'à 20) |
+| personne | pixellisation | 3-4 px |
+| personne | postérisation | 5 bits supprimés (8 niveaux/canal) |
+| personne | assombrissement | 85 % |
+| personne | inversion | 40 % (jamais revu jusqu'à 100 %) |
+
+Les valeurs rejoignent celles des images de test : très tolérant au gris, au sombre
+et au flou ; très fragile au bruit, à la binarisation et au négatif.
